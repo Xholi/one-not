@@ -1,25 +1,17 @@
-import { PrismaClient } from "@prisma/client";
-import bcrypt from "bcryptjs";
-
+import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
-
-async function main() {
-  const passwordHash = await bcrypt.hash("password123", 10);
-  const users = Array.from({ length: 6 }).map((_, i) => ({
-    email: `user${i + 1}@demo.dev`,
-    passwordHash,
-    displayName: `Demo ${i + 1}`,
-    age: 21 + (i % 10),
-    gender: i % 2 === 0 ? "male" : "female",
-    bio: "Demo account for testing.",
-    photos: [
-      `https://picsum.photos/seed/${i + 1}/600/800`,
-      `https://picsum.photos/seed/${i + 100}/600/800`
-    ],
-    interests: ["music", "fitness", "travel"].slice(0, (i % 3) + 1)
-  }));
-  for (const data of users) await prisma.user.create({ data });
-  console.log("Seeded demo users");
+async function main(){ 
+  const pw = await bcrypt.hash('password123',10);
+  for(let i=1;i<=8;i++){
+    await prisma.user.create({ data: {
+      email:`user${i}@demo.dev`, passwordHash:pw, displayName:`Demo ${i}`, age:20+i,
+      gender: i%2===0?'male':'female',
+      bio:'Demo account', photos:[`https://picsum.photos/seed/${i}/600/800`],
+      interests:['music','travel'].slice(0,(i%2)+1),
+      latitude: -26.0 + i*0.01, longitude: 28.0 + i*0.01, city:'Johannesburg', country:'ZA'
+    }});
+  }
+  console.log('seeded');
 }
-
-main().finally(() => prisma.$disconnect());
+main().finally(()=>prisma.$disconnect());
