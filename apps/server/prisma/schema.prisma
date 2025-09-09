@@ -1,0 +1,92 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  passwordHash  String
+  displayName   String
+  age           Int
+  gender        String?
+  bio           String?
+  photos        String[] @default([])
+  interests     String[] @default([])
+  verified      Boolean  @default(false)
+  latitude      Float?   
+  longitude     Float?   
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  likesGiven    Like[]   @relation("likesGiven")
+  likesReceived Like[]   @relation("likesReceived")
+  matchesA      Match[]  @relation("matchesA")
+  matchesB      Match[]  @relation("matchesB")
+  messages      Message[]
+  boosts        Boost[]
+  reports       Report[]
+  subscriptions Subscription[]
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  fromId    String
+  toId      String
+  createdAt DateTime @default(now())
+  from      User     @relation("likesGiven", fields: [fromId], references: [id])
+  to        User     @relation("likesReceived", fields: [toId], references: [id])
+}
+
+model Match {
+  id        String   @id @default(cuid())
+  userAId   String
+  userBId   String
+  createdAt DateTime @default(now())
+  userA     User     @relation("matchesA", fields: [userAId], references: [id])
+  userB     User     @relation("matchesB", fields: [userBId], references: [id])
+  messages  Message[]
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  matchId   String
+  senderId  String
+  text      String?
+  mediaUrl  String?
+  createdAt DateTime @default(now())
+  match     Match    @relation(fields: [matchId], references: [id])
+  sender    User     @relation(fields: [senderId], references: [id])
+}
+
+model Boost {
+  id        String   @id @default(cuid())
+  userId    String
+  expiresAt DateTime
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Report {
+  id        String   @id @default(cuid())
+  reporterId String
+  targetId   String
+  reason     String
+  createdAt  DateTime @default(now())
+  reporter   User     @relation("reporter", fields: [reporterId], references: [id])
+  target     User     @relation("target", fields: [targetId], references: [id])
+}
+
+model Subscription {
+  id                   String   @id @default(cuid())
+  userId               String
+  stripeSubscriptionId String   @unique
+  priceId              String
+  status               String
+  currentPeriodStart   DateTime?
+  currentPeriodEnd     DateTime?
+  createdAt            DateTime @default(now())
+  user                 User     @relation(fields: [userId], references: [id])
+}

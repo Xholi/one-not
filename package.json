@@ -1,0 +1,15 @@
+{
+  "name": "one-not",
+  "private": true,
+  "packageManager": "pnpm@9.11.0",
+  "workspaces": ["apps/*", "shared"],
+  "scripts": {
+    "dev": "concurrently -n SERVER,WEB -c blue,magenta \"pnpm --filter server dev\" \"pnpm --filter web dev\"",
+    "build": "pnpm --filter server build && pnpm --filter web build",
+    "format": "prettier -w ."
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "prettier": "^3.3.3"
+  }
+}
