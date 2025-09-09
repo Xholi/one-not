@@ -1,9 +1,6 @@
 FROM node:20-alpine
 WORKDIR /usr/src/app
-COPY package.json pnpm-lock.yaml* ./
-RUN corepack enable && corepack prepare pnpm@latest --activate
 COPY . .
-RUN pnpm install --no-frozen-lockfile
-RUN pnpm --filter server build
-ENV NODE_ENV=production
+RUN npm install
+RUN npm run build
 CMD ["node", "dist/index.js"]
