@@ -5,5 +5,7 @@ export const UpdateProfileSchema = z.object({
   photos: z.array(z.string().url()).max(6).optional(),
   gender: z.string().optional(),
   latitude: z.number().optional(),
-  longitude: z.number().optional()
+  longitude: z.number().optional(),
+  city: z.string().max(100).optional(),
+  country: z.string().max(100).optional(),
 });
